@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Confronto codici fiscali</title>
+<style>
+  body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: auto; }
+  textarea { width: 100%; height: 150px; margin-bottom: 10px; text-transform: uppercase; }
+  button { padding: 10px 20px; font-size: 16px; cursor: pointer; background: #007BFF; color: white; border: none; border-radius: 4px; }
+  #risultato { margin-top: 20px; font-size: 24px; font-weight: bold; color: #333; }
+</style>
+</head>
+<body>
+
+<h2>Elenco diabetici</h2>
+<textarea id="diabetici"></textarea>
+
+<h2>Elenco vaccinati</h2>
+<textarea id="vaccinati"></textarea>
+
+<button onclick="confronta()">Confronta</button>
+
+<div id="risultato"></div>
+
+<script>
+  function confronta() {
+    const testoDiabetici = document.getElementById('diabetici').value;
+    const testoVaccinati = document.getElementById('vaccinati').value;
+
+    const setDiabetici = new Set(testoDiabetici.split(/\s+/).filter(cf => cf.trim() !== "").map(cf => cf.toUpperCase()));
+    const setVaccinati = new Set(testoVaccinati.split(/\s+/).filter(cf => cf.trim() !== "").map(cf => cf.toUpperCase()));
+
+    let conteggio = 0;
+    setDiabetici.forEach(cf => {
+      if (setVaccinati.has(cf)) {
+        conteggio++;
+      }
+    });
+
+    document.getElementById('risultato').innerText = "diabetici vaccinati: " + conteggio;
+  }
+</script>
+</body>
+</html>

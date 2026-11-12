@@ -2,43 +2,156 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Confronto codici fiscali</title>
 <style>
-  body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: auto; }
-  textarea { width: 100%; height: 150px; margin-bottom: 10px; text-transform: uppercase; }
-  button { padding: 10px 20px; font-size: 16px; cursor: pointer; background: #007BFF; color: white; border: none; border-radius: 4px; }
+  body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: auto; color: #222; }
+  label { display: block; font-size: 1.3em; font-weight: bold; margin: 18px 0 6px; }
+  textarea { width: 100%; height: 150px; box-sizing: border-box; text-transform: uppercase; font-family: monospace; }
+  .info { font-size: 0.95em; color: #555; margin-top: 4px; }
+  .avviso { font-size: 0.95em; color: #a15c00; margin-top: 4px; }
+  button { padding: 10px 20px; font-size: 16px; cursor: pointer; color: white; border: none; border-radius: 4px; margin: 14px 8px 0 0; }
+  #btnConfronta { background: #007BFF; }
+  #btnSvuota { background: #6c757d; }
   #risultato { margin-top: 20px; font-size: 24px; font-weight: bold; color: #333; }
+  #dettaglio { margin-top: 6px; font-size: 1em; color: #555; }
+  #errore { margin-top: 20px; font-size: 18px; font-weight: bold; color: #b00020; }
+  .nota { margin-top: 30px; font-size: 0.85em; color: #777; }
 </style>
 </head>
 <body>
 
-<h2>Elenco diabetici</h2>
+<h1>Diabetici vaccinati</h1>
+<p class="info">Incolla i codici fiscali in qualsiasi formato (uno per riga, separati da virgole o punto e virgola, anche con nomi o altre colonne accanto): vengono riconosciuti automaticamente.</p>
+
+<label for="diabetici">Elenco diabetici</label>
 <textarea id="diabetici"></textarea>
+<div id="infoDiabetici" class="info"></div>
+<div id="avvisoDiabetici" class="avviso"></div>
 
-<h2>Elenco vaccinati</h2>
+<label for="vaccinati">Elenco vaccinati</label>
 <textarea id="vaccinati"></textarea>
+<div id="infoVaccinati" class="info"></div>
+<div id="avvisoVaccinati" class="avviso"></div>
 
-<button onclick="confronta()">Confronta</button>
+<label for="vaccino">Vaccino dell'elenco "vaccinati" e target</label>
+<select id="vaccino">
+  <option value="30|Herpes Zoster (HZV)">Herpes Zoster (HZV) - target diabetici ≥ 30%</option>
+  <option value="35|Pneumococco (PNC)">Pneumococco (PNC) - target diabetici ≥ 35%</option>
+  <option value="40|Influenza (FLU)">Influenza (FLU) - target diabetici ≥ 40%</option>
+</select>
+<div class="info">Soglie del progetto "Vaccinazioni AFT 2026" (criteri ECM), da raggiungere entro il 31/12/2026.</div>
 
-<div id="risultato"></div>
+<button id="btnConfronta" type="button">Confronta</button>
+<button id="btnSvuota" type="button">Svuota</button>
+
+<div id="errore" role="alert"></div>
+<div id="risultato" aria-live="polite"></div>
+<div id="dettaglio"></div>
+
+<p class="nota">I dati incollati restano nel tuo browser: non vengono inviati né salvati da nessuna parte.</p>
 
 <script>
-  function confronta() {
-    const testoDiabetici = document.getElementById('diabetici').value;
-    const testoVaccinati = document.getElementById('vaccinati').value;
+  // Codice fiscale: 6 lettere, 2 cifre, lettera, 2 cifre, lettera, 3 cifre, lettera.
+  // Le cifre possono essere sostituite da lettere (omocodia), quindi accetto lettere o cifre.
+  const CF_VALIDO = /(?<![A-Z0-9])[A-Z]{6}[A-Z0-9]{2}[A-Z][A-Z0-9]{2}[A-Z][A-Z0-9]{3}[A-Z](?![A-Z0-9])/g;
 
-    const setDiabetici = new Set(testoDiabetici.split(/\s+/).filter(cf => cf.trim() !== "").map(cf => cf.toUpperCase()));
-    const setVaccinati = new Set(testoVaccinati.split(/\s+/).filter(cf => cf.trim() !== "").map(cf => cf.toUpperCase()));
+  function pulisci(testo) {
+    // Rimuove caratteri invisibili (spazio a larghezza zero, BOM, ecc.) e porta in maiuscolo
+    return testo.replace(/[​-‍⁠﻿]/g, "").toUpperCase();
+  }
+
+  function analizza(testo) {
+    const t = pulisci(testo);
+    const trovati = t.match(CF_VALIDO) || [];
+    const unici = new Set(trovati);
+    // Voci che sembrano codici fiscali ma non lo sono (troncati, con refusi, troppo lunghi)
+    const sospetti = new Set();
+    const resto = t.replace(CF_VALIDO, " ");
+    (resto.match(/[A-Z0-9]{11,20}/g) || []).forEach(v => {
+      if (/\d/.test(v)) sospetti.add(v);
+    });
+    return { totale: trovati.length, unici, sospetti: Array.from(sospetti) };
+  }
+
+  function mostra(prefisso, r) {
+    const info = document.getElementById("info" + prefisso);
+    const avviso = document.getElementById("avviso" + prefisso);
+    const dup = r.totale - r.unici.size;
+    info.textContent = r.unici.size + " codici fiscali validi (unici)" + (dup > 0 ? " - " + dup + " duplicati ignorati" : "");
+    if (r.sospetti.length > 0) {
+      const esempi = r.sospetti.slice(0, 5).join(", ") + (r.sospetti.length > 5 ? ", ..." : "");
+      avviso.textContent = "Attenzione: " + r.sospetti.length + " voci sembrano codici fiscali ma non sono validi e sono state escluse: " + esempi;
+    } else {
+      avviso.textContent = "";
+    }
+  }
+
+  function leggi() {
+    const d = analizza(document.getElementById("diabetici").value);
+    const v = analizza(document.getElementById("vaccinati").value);
+    mostra("Diabetici", d);
+    mostra("Vaccinati", v);
+    return { d, v };
+  }
+
+  function confronta() {
+    const { d, v } = leggi();
+    const errore = document.getElementById("errore");
+    const risultato = document.getElementById("risultato");
+    const dettaglio = document.getElementById("dettaglio");
+    errore.textContent = "";
+    risultato.textContent = "";
+    dettaglio.textContent = "";
+
+    if (d.unici.size === 0 || v.unici.size === 0) {
+      const quali = [];
+      if (d.unici.size === 0) quali.push("diabetici");
+      if (v.unici.size === 0) quali.push("vaccinati");
+      errore.textContent = "Nessun codice fiscale valido trovato nell'elenco: " + quali.join(" e ") + ".";
+      return;
+    }
 
     let conteggio = 0;
-    setDiabetici.forEach(cf => {
-      if (setVaccinati.has(cf)) {
-        conteggio++;
-      }
-    });
+    d.unici.forEach(cf => { if (v.unici.has(cf)) conteggio++; });
+    const perc = (conteggio / d.unici.size * 100).toFixed(1).replace(".", ",");
 
-    document.getElementById('risultato').innerText = "diabetici vaccinati: " + conteggio;
+    risultato.textContent = "diabetici vaccinati: " + conteggio;
+    const righe = [conteggio + " su " + d.unici.size + " diabetici (" + perc + "%)"];
+
+    // Target: vaccinati necessari = ceil(denominatore x soglia)
+    const [soglia, nome] = document.getElementById("vaccino").value.split("|");
+    const n = d.unici.size;
+    const serve = Math.ceil(n * Number(soglia) / 100 - 1e-9);
+    const mancano = Math.max(0, serve - conteggio);
+    const fmt = x => x.toFixed(1).replace(".", ",");
+    righe.push("Target " + nome + " ≥ " + soglia + "%: servono " + serve + " diabetici vaccinati su " + n + ".");
+    if (mancano === 0) {
+      righe.push("Target raggiunto (" + (conteggio - serve) + " in più della soglia).");
+    } else {
+      const nonVacc = n - conteggio;
+      righe.push("Mancano " + mancano + " diabetici da vaccinare: " + fmt(mancano / n * 100) +
+        "% dei diabetici (" + fmt(mancano / nonVacc * 100) + "% di quelli non ancora vaccinati).");
+    }
+    dettaglio.innerHTML = "";
+    righe.forEach(r => { const p = document.createElement("div"); p.textContent = r; dettaglio.appendChild(p); });
   }
+
+  function svuota() {
+    document.getElementById("diabetici").value = "";
+    document.getElementById("vaccinati").value = "";
+    document.getElementById("errore").textContent = "";
+    document.getElementById("risultato").textContent = "";
+    document.getElementById("dettaglio").textContent = "";
+    leggi();
+  }
+
+  document.getElementById("btnConfronta").addEventListener("click", confronta);
+  document.getElementById("btnSvuota").addEventListener("click", svuota);
+  document.getElementById("diabetici").addEventListener("input", leggi);
+  document.getElementById("vaccinati").addEventListener("input", leggi);
+  document.getElementById("vaccino").addEventListener("change", () => { if (document.getElementById("risultato").textContent) confronta(); });
+  leggi();
 </script>
 </body>
 </html>

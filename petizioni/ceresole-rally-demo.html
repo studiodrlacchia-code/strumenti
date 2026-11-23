@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Petizione Ceresole · pagina dimostrativa</title>
+<style>
+  :root {
+    --bg: #f6f4ef;
+    --card: #ffffff;
+    --ink: #1f2a24;
+    --muted: #5c6a62;
+    --line: #dcd8cc;
+    --accent: #2f5d46;
+    --accent-ink: #ffffff;
+    --warn-bg: #fff3cd;
+    --warn-ink: #5a4500;
+    --ok-bg: #e4f1e8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151b17;
+      --card: #1e2621;
+      --ink: #e8ece9;
+      --muted: #9fb0a6;
+      --line: #33403a;
+      --accent: #7fc19b;
+      --accent-ink: #11201a;
+      --warn-bg: #3d3410;
+      --warn-ink: #f3e3a3;
+      --ok-bg: #1f3328;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 17px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .demo-bar {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--warn-bg); color: var(--warn-ink);
+    padding: 8px 16px; font-size: 14px; text-align: center;
+    border-bottom: 1px solid var(--line);
+  }
+  .banner { margin: 0 auto; max-width: 900px; background: #1f3a4d; }
+  .banner img {
+    display: block; width: 100%; height: auto; max-height: 360px;
+    object-fit: cover; object-position: center 60%;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font: 700 clamp(26px, 5vw, 38px)/1.2 Georgia, "Times New Roman", serif; margin: 12px 0 8px; }
+  h2 { font: 700 22px/1.3 Georgia, "Times New Roman", serif; margin: 0 0 12px; }
+  .lead { font-size: 19px; color: var(--muted); margin: 0 0 20px; }
+  section, details.card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 20px; margin: 18px 0;
+  }
+  ul.facts { margin: 0; padding-left: 20px; }
+  ul.facts li { margin: 8px 0; }
+  .asks { counter-reset: n; list-style: none; padding: 0; margin: 0; }
+  .asks li { counter-increment: n; position: relative; padding-left: 38px; margin: 12px 0; }
+  .asks li::before {
+    content: counter(n); position: absolute; left: 0; top: 1px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--accent); color: var(--accent-ink);
+    font-weight: 700; font-size: 14px; display: grid; place-items: center;
+  }
+  label { display: block; font-weight: 600; margin: 14px 0 4px; }
+  .hint { font-weight: 400; color: var(--muted); font-size: 14px; }
+  input[type=text], input[type=email], textarea {
+    width: 100%; padding: 11px 12px; font: inherit; color: var(--ink);
+    background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+  }
+  textarea { min-height: 84px; resize: vertical; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 540px) { .row { grid-template-columns: 1fr; } }
+  .check { display: flex; gap: 10px; align-items: flex-start; font-weight: 400; margin-top: 16px; }
+  .check input { margin-top: 5px; flex: none; }
+  button {
+    font: inherit; font-weight: 700; cursor: pointer;
+    background: var(--accent); color: var(--accent-ink);
+    border: 0; border-radius: 10px; padding: 13px 20px; margin-top: 18px;
+    width: 100%;
+  }
+  button.secondary { background: transparent; color: var(--accent); border: 2px solid var(--accent); }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  .mail {
+    background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px 16px; font-size: 15.5px;
+  }
+  .mail .hdr { color: var(--muted); font-size: 14px; margin-bottom: 8px; line-height: 1.6; }
+  .mail .hdr b { color: var(--ink); }
+  .mail p { margin: 0 0 10px; }
+  .mail ol { margin: 0 0 10px; padding-left: 22px; }
+  .mail ol li { margin: 4px 0; }
+  .ph { background: var(--warn-bg); color: var(--warn-ink); padding: 0 4px; border-radius: 4px; }
+  .step { display: none; }
+  .step.on { display: block; }
+  .ok { background: var(--ok-bg); border-radius: 8px; padding: 14px 16px; }
+  .tag {
+    display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .04em;
+    text-transform: uppercase; padding: 2px 8px; border-radius: 99px;
+    background: var(--warn-bg); color: var(--warn-ink);
+  }
+  details summary { cursor: pointer; font-weight: 700; font-size: 18px; }
+  details .body { margin-top: 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; }
+  th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--bg); }
+  .small { font-size: 14px; color: var(--muted); }
+  footer { color: var(--muted); font-size: 13px; text-align: center; margin-top: 32px; }
+</style>
+</head>
+<body>
+
+<div class="demo-bar"><b>PAGINA DIMOSTRATIVA</b> · nessuna email viene inviata · testi e indirizzi sono segnaposto</div>
+
+<figure class="banner">
+  <img src="lago-ceresole-reale.jpg" alt="Il lago di Ceresole Reale con l'abitato sulla riva e le montagne sullo sfondo" width="900" height="500">
+</figure>
+
+<main>
+
+<span class="tag">Bozza per i promotori</span>
+<h1>Gare di auto sul ghiaccio a Ceresole Reale: il Parco che ne pensa?</h1>
+<p class="lead">Un minuto per chiedere al Presidente del Parco Nazionale Gran Paradiso di rispondere a tre domande.</p>
+
+<section>
+  <h2>Di cosa si tratta</h2>
+  <ul class="facts">
+    <li>La stampa riferisce di un'ipotesi di <b>pista per gare automobilistiche su neve e ghiaccio</b> nell'area dell'invaso di Ceresole Reale, con due manifestazioni nei primi mesi del 2027.</li>
+    <li>Il Sindaco ha precisato che la proposta è <b>ancora in valutazione</b> e che l'area sarebbe fuori dal perimetro del Parco.</li>
+    <li>Ceresole Reale però figura tra i <b>«Comuni nell'area protetta del Parco»</b> nella Dichiarazione Ambientale EMAS 2026-2029.</li>
+    <li>Il Parco ha regolato l'accesso in auto al <b>Colle del Nivolet</b> per ridurre il traffico. Le due scelte faticano a stare insieme.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Cosa chiediamo al Presidente</h2>
+  <ol class="asks">
+    <li>L'Ente Parco è stato <b>informato e coinvolto</b>? Sono state chieste o rilasciate autorizzazioni per i lavori preparatori?</li>
+    <li>È prevista la <b>Valutazione di Incidenza Ambientale</b>, data la vicinanza al sito Natura 2000 «Parco Nazionale Gran Paradiso»?</li>
+    <li>Gli organi del Parco intendono esprimere una <b>posizione pubblica</b> sull'iniziativa?</li>
+  </ol>
+</section>
+
+<section id="scrivi">
+  <h2>Scrivi al Presidente</h2>
+
+  <div class="step on" id="s1">
+    <p class="small" style="margin-top:0">La lettera parte con il tuo nome, dal tuo indirizzo di risposta. Prima dell'invio ricevi un link di conferma.</p>
+    <div class="row">
+      <div><label for="nome">Nome</label><input type="text" id="nome" autocomplete="given-name" value="Maria"></div>
+      <div><label for="cognome">Cognome</label><input type="text" id="cognome" autocomplete="family-name" value="Rossi"></div>
+    </div>
+    <div class="row">
+      <div><label for="comune">Comune di residenza</label><input type="text" id="comune" autocomplete="address-level2" value="Torino"></div>
+      <div><label for="email">La tua email <span class="hint">(per la conferma)</span></label><input type="email" id="email" autocomplete="email" value="maria@esempio.it"></div>
+    </div>
+    <label for="riga">Una riga tua <span class="hint">(facoltativa, la rende più efficace)</span></label>
+    <textarea id="riga" maxlength="300" placeholder="Frequento Ceresole da trent'anni e ci vengo per il silenzio.">Frequento Ceresole da trent'anni e ci vengo per il silenzio.</textarea>
+
+    <h3 style="margin:22px 0 8px;font-size:17px">Così arriverà la lettera</h3>
+    <div class="mail" id="anteprima"></div>
+
+    <label class="check"><input type="checkbox" id="ok" checked>
+      <span>Autorizzo l'invio di questa lettera a mio nome. Il mio indirizzo serve solo per la conferma e per le risposte; non viene conservato né usato per altro.</span></label>
+    <button id="invia" type="button">Invia la lettera (demo)</button>
+  </div>
+
+  <div class="step" id="s2">
+    <div class="ok">
+      <b>Controlla la tua posta.</b><br>
+      Ti abbiamo scritto a <b id="mail-echo"></b>. Premi il link nel messaggio per confermare: solo allora la lettera parte.
+    </div>
+    <p class="small">La conferma evita che qualcuno faccia scrivere al Presidente a nome altrui.</p>
+    <button id="conferma" type="button" class="secondary">Simula il clic sul link di conferma</button>
+  </div>
+
+  <div class="step" id="s3">
+    <div class="ok">
+      <b>Lettera inviata.</b> Ne riceverai copia. Le risposte del Presidente arriveranno direttamente a te.<br>
+      <span class="small">Hai firmato in <b>1</b> su 1 (contatore simulato).</span>
+    </div>
+    <button id="ricomincia" type="button" class="secondary">Ricomincia la demo</button>
+  </div>
+</section>
+
+<details class="card">
+  <summary>Per i promotori: come funzionerebbe davvero</summary>
+  <div class="body">
+    <p><b>Percorso del firmatario.</b> Compila il modulo, riceve un'email con un link, lo apre, la lettera parte. Tre passaggi, circa un minuto.</p>
+    <p><b>Cosa serve dietro la pagina.</b> Una piccola funzione online che invia le email, con servizio di posta transazionale a piano gratuito. Costo previsto: zero entro poche centinaia di invii al giorno.</p>
+    <table>
+      <tr><th>Tema</th><th>Scelta proposta</th></tr>
+      <tr><td>Mittente</td><td>La lettera parte dal sito, con il firmatario in firma e il suo indirizzo come «Rispondi a». Il Presidente risponde alla persona, non al sito.</td></tr>
+      <tr><td>Abusi</td><td>Conferma via link, un solo invio per indirizzo, tetto giornaliero, campo-trappola contro i programmi automatici.</td></tr>
+      <tr><td>Dati</td><td>Nome, comune e indirizzo non vengono archiviati. Il sistema invia e dimentica. Il contatore pubblico, se lo volete, richiede un piccolo archivio e un'informativa.</td></tr>
+      <tr><td>Testo</td><td>Versione condensata e formale (circa 2.000 caratteri) più una riga personale facoltativa. Le lettere tutte uguali vengono smistate come campagna; con la riga propria no.</td></tr>
+      <tr><td>Lettera integrale</td><td>Può restare consultabile in una pagina a parte, per chi vuole leggere le motivazioni complete.</td></tr>
+      <tr><td>Indirizzi</td><td>Presidente e Sindaco (in copia): da inserire e da verificare sui siti istituzionali.</td></tr>
+    </table>
+    <p><b>Da decidere insieme.</b></p>
+    <ul>
+      <li>Chi firma il sito come promotore (nome o gruppo) e quale contatto indicare.</li>
+      <li>Se mostrare un contatore di adesioni.</li>
+      <li>Se avvisare in anticipo il Parco e il Comune che la campagna esiste.</li>
+      <li>Verifica puntuale di ogni citazione (EMAS, articolo 3 dello Statuto, codice del sito Natura 2000) prima di andare online.</li>
+    </ul>
+    <p class="small">Per un sito vero serve un indirizzo proprio e una cartella separata da questa pagina dimostrativa.</p>
+  </div>
+</details>
+
+<footer>Pagina dimostrativa · Gilberto Lacchia, 2026 v.0.1 · Foto del lago: Wikimedia Commons · I dati digitati restano nel tuo browser: questa demo non invia né salva nulla.</footer>
+
+</main>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var campi = ['nome', 'cognome', 'comune', 'riga'];
+
+  function el(tag, text, cls) {
+    var e = document.createElement(tag);
+    if (text != null) e.textContent = text;
+    if (cls) e.className = cls;
+    return e;
+  }
+  function seg(testo, vuoto) {
+    // testo reale o segnaposto evidenziato
+    return testo.trim() ? document.createTextNode(testo.trim()) : el('span', vuoto, 'ph');
+  }
+
+  function anteprima() {
+    var box = $('anteprima');
+    box.textContent = '';
+
+    var h = el('div', null, 'hdr');
+    h.appendChild(el('b', 'A: ')); h.appendChild(el('span', '[indirizzo del Presidente]', 'ph')); h.appendChild(document.createElement('br'));
+    h.appendChild(el('b', 'Cc: ')); h.appendChild(el('span', '[indirizzo del Sindaco]', 'ph')); h.appendChild(document.createElement('br'));
+    h.appendChild(el('b', 'Oggetto: ')); h.appendChild(document.createTextNode('Ipotesi di pista per gare su neve e ghiaccio nell’area dell’invaso di Ceresole Reale: richiesta di chiarimenti'));
+    box.appendChild(h);
+
+    box.appendChild(el('p', 'Gentile Presidente, dott. Mauro Durbano,'));
+    box.appendChild(el('p', 'p.c. Al Sindaco di Ceresole Reale, Alex Gioannini'));
+
+    box.appendChild(el('p', 'Le scrivo in merito alle notizie di stampa su un’ipotesi di pista per competizioni automobilistiche su neve e ghiaccio nell’area dell’invaso di Ceresole Reale, con due manifestazioni previste nei primi mesi del 2027. Il Sindaco ha precisato che la proposta è ancora in fase di valutazione e che l’area sarebbe esterna al perimetro del Parco. Ceresole Reale, tuttavia, figura tra i «Comuni nell’area protetta del Parco» nella Dichiarazione Ambientale EMAS 2026-2029, e i confini amministrativi non coincidono con quelli degli ecosistemi.'));
+
+    box.appendChild(el('p', 'L’iniziativa appare difficile da conciliare con l’articolo 3 dello Statuto dell’Ente, che indica tra le finalità la tutela ambientale e uno sviluppo sostenibile, e con gli impegni assunti con la certificazione ISO 14001 e la registrazione EMAS. Lo è anche rispetto alla regolamentazione dell’accesso automobilistico al Colle del Nivolet, promossa dall’Ente insieme ai Comuni, tra cui Ceresole Reale, per ridurre la pressione del traffico.'));
+
+    box.appendChild(el('p', 'Le chiedo cortesemente:'));
+    var ol = document.createElement('ol');
+    ['se l’Ente Parco sia stato informato e coinvolto, e se siano state richieste o rilasciate autorizzazioni per interventi preparatori;',
+     'se sia prevista la Valutazione di Incidenza Ambientale (VIncA), data la vicinanza al sito Natura 2000 IT1201000 «Parco Nazionale Gran Paradiso»;',
+     'se gli organi di governo del Parco intendano esprimere una posizione pubblica sull’iniziativa.'
+    ].forEach(function (t) { ol.appendChild(el('li', t)); });
+    box.appendChild(ol);
+
+    box.appendChild(el('p', 'Mi rivolgo a Lei anche in considerazione della Sua duplice responsabilità di Presidente del Parco e di vicesindaco di Ceresole Reale. Il Gran Paradiso è il primo parco nazionale italiano, istituito nel 1922: la sua responsabilità non è soltanto amministrativa, ma anche di indirizzo. Una posizione chiara sarebbe coerente con le finalità e con gli impegni ambientali dell’Ente.'));
+
+    var riga = $('riga').value.trim();
+    if (riga) box.appendChild(el('p', riga));
+
+    box.appendChild(el('p', 'Confidando in un Suo cortese riscontro, porgo distinti saluti.'));
+
+    var firma = el('p', null);
+    var nc = ($('nome').value + ' ' + $('cognome').value).trim();
+    firma.appendChild(nc ? document.createTextNode(nc) : el('span', '[nome e cognome]', 'ph'));
+    firma.appendChild(document.createElement('br'));
+    firma.appendChild(seg($('comune').value, '[comune]'));
+    box.appendChild(firma);
+
+    var pronto = $('nome').value.trim() && $('cognome').value.trim() && $('comune').value.trim() &&
+                 /^\S+@\S+\.\S+$/.test($('email').value.trim()) && $('ok').checked;
+    $('invia').disabled = !pronto;
+  }
+
+  function vai(n) {
+    ['s1', 's2', 's3'].forEach(function (id) { $(id).classList.toggle('on', id === 's' + n); });
+    $('scrivi').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  campi.concat(['email']).forEach(function (id) { $(id).addEventListener('input', anteprima); });
+  $('ok').addEventListener('change', anteprima);
+  $('invia').addEventListener('click', function () { $('mail-echo').textContent = $('email').value.trim(); vai(2); });
+  $('conferma').addEventListener('click', function () { vai(3); });
+  $('ricomincia').addEventListener('click', function () { vai(1); });
+  anteprima();
+})();
+</script>
+</body>
+</html>
